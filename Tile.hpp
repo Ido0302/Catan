@@ -8,10 +8,12 @@
 #include "Vertex.hpp"
 #include "Edge.hpp"
 
+#define TILE_LENGTH 6
+
 using namespace std;
 
 //differene types of terrain hexes
-enum class Resource
+enum class Land
 {
     Hill,
     Forest,
@@ -24,19 +26,22 @@ enum class Resource
 class Tile
 {
 private:
-    vector<Vertex> junctions;
-    vector<Edge> lanes;
-    int rollDices; //2-12
-    Resource resource ;
+    vector<Vertex*> junctions;
+    vector<Edge*> lanes;
+    int circleNumber; //2-12
+    Land land ;
 
 
 public:
-Tile(vector<Vertex>& ver, int roll, Resource r);
-Tile(vector<Vertex>& ver);
-vector<Vertex>& getJunctions();
-vector<Edge>& getLanes();
-int getRollDices();
-string getResource();
+Tile(vector<Vertex*>& ver, vector<Edge*>& edges, int roll, Land l);
+Tile(vector<Vertex*>& ver, vector<Edge*>& edges);
+vector<Vertex*>& getJunctions();
+vector<Edge*>& getLanes();
+int getCircleNumber();
+Land getLand();
+string getLandAsString();
+void printTile();
+bool foundVertex(Vertex* v);
 
 };
 
