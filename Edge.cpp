@@ -10,6 +10,8 @@ using namespace std;
 // constructor
 Edge::Edge(Vertex *v1, Vertex *v2) : v1(v1), v2(v2){};
 
+Edge::~Edge(){}
+
 int Edge::getV1()
 {
     return this->v1->getVertex();

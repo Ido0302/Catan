@@ -32,9 +32,13 @@ private:
     int points = 0;
     int color;
     vector<int> resources;
+
     vector<Edge*> roads;
     vector<Vertex*> settlements;
     vector<Vertex*> cities;
+
+    int knights = 0;
+    bool largestArmy = false; 
 
 public:
 
@@ -46,7 +50,7 @@ public:
     int getColor();
 
     vector<int> getResources();                           // return player's resources
-    int getResourceFromString(string r);                      // get resource at int and return it as string   
+    int getResourceFromString(string r);                  // get resource as string and return it as int   
     void setResources(int typeResource, int newCount);    // get resource and change the count of it
     void addResource(Land land);                          //get land and add the product to player's resources
     void getBeginnersResource(Board &b);                  //add resources according the places of settlements
@@ -70,6 +74,16 @@ public:
     void buildCity(int junction, Board& b);
 
     void trade(Player* p, string wantedResource, int countReceive, string unwantedResource, int countGive);
+
+    int getKnights();
+    void addKnights();
+    bool hasLargestArmy();
+    void reachLargestArmy(Catan& catan, vector<Player*>& p);
+    void lossLargestArmy();
+
+    void buyDevelopmentCard(Catan& catan, vector<Player*>& p, Board& b);
+
+    void cleanPlayer();
 
 };
 

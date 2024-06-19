@@ -35,6 +35,8 @@ private:
 public:
 Tile(vector<Vertex*>& ver, vector<Edge*>& edges, int roll, Land l);
 Tile(vector<Vertex*>& ver, vector<Edge*>& edges);
+~Tile();
+
 vector<Vertex*>& getJunctions();
 vector<Edge*>& getLanes();
 int getCircleNumber();

@@ -20,9 +20,10 @@ private:
 
 public:
     Board();
-    // void initializeBoard();
     vector<Tile> &getBoard();
     void printBoard();
+    void clearBoard(); // destructor
+
     Vertex *findVertex(int index);             // get index and return the address of vertex with this index
     Edge *findEdge(int index1, int index2);    // get 2 indexes and return the address of edge with these indexes
     vector<Tile> findTiles(int rollNumber);    // get number of roll and return all tiles with this number

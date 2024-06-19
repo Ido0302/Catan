@@ -6,11 +6,10 @@
 #include "Edge.hpp"
 #include "Tile.hpp"
 
-
 using namespace std;
 
 // constructor
-Tile::Tile(vector<Vertex *> &vertices, vector<Edge*> &edges, int circleNumber, Land l)
+Tile::Tile(vector<Vertex *> &vertices, vector<Edge *> &edges, int circleNumber, Land l)
 {
     // if the vector of vertices contains more than or less than 6 vertices
     if (vertices.size() != 6)
@@ -31,7 +30,7 @@ Tile::Tile(vector<Vertex *> &vertices, vector<Edge*> &edges, int circleNumber, L
 }
 
 // constructor desert tile who doesn't include circle number or Land
-Tile::Tile(vector<Vertex *> &vertices, vector<Edge*> &edges)
+Tile::Tile(vector<Vertex *> &vertices, vector<Edge *> &edges)
 {
     if (vertices.size() != 6)
         __throw_invalid_argument("Invalid tile: The tile should to be with six vertices.");
@@ -41,10 +40,11 @@ Tile::Tile(vector<Vertex *> &vertices, vector<Edge*> &edges)
         __throw_invalid_argument("Invalid tile: The tile should to be with six edges.");
     this->lanes = edges;
 
-
     this->land = Land::Desert;
     this->circleNumber = 0;
 }
+
+Tile::~Tile(){}
 
 vector<Vertex *> &Tile::getJunctions()
 {
@@ -106,14 +106,14 @@ void Tile::printTile()
 /**
  * get vertex and return true if it's belong to tile. else rerurn false
  */
-bool Tile::foundVertex(Vertex* v)
+bool Tile::foundVertex(Vertex *v)
 {
     for (size_t i = 0; i < TILE_LENGTH; i++)
     {
-        if(junctions[i]->getVertex() == v->getVertex()){
+        if (junctions[i]->getVertex() == v->getVertex())
+        {
             return true;
         }
     }
     return false;
 }
-

@@ -6,7 +6,6 @@
 #include <ctime>
 #include <limits>
 
-
 #include "Person.hpp"
 #include "Player.hpp"
 #include "Vertex.hpp"
@@ -42,17 +41,19 @@ vector<int> Player::getResources()
     return this->resources;
 }
 
-int Player::getResourceFromString(string r)
+int Player::getResourceFromString(string res)
 {
-    if (r == "brick")
+    if (res == "brick")
         return brick;
-    if (r == "lumber")
+    if (res == "lumber")
         return lumber;
-    if (r == "iron")
+    if (res == "iron")
         return iron;
-    if (r == "wheat")
+    if (res == "wheat")
         return wheat;
-    return wool;
+    if (res == "wool")
+        return wool;
+    return -1;
 }
 
 vector<Edge *> Player::getRoads()
@@ -78,11 +79,11 @@ void Player::printPlayer()
     cout << "Name: " << this->getName() << endl
          << "Age: " << this->getAge() << endl;
     if (color == 1)
-        cout << "Color: Red" << this->getColor() << endl;
+        cout << "Color: Red" << endl;
     if (color == 2)
-        cout << "Color: Orange" << this->getColor() << endl;
+        cout << "Color: Orange" << endl;
     if (color == 3)
-        cout << "Color: White" << this->getColor() << endl;
+        cout << "Color: White" << endl;
     cout << "Points: " << this->getPoints() << endl;
     cout << endl;
 }
@@ -177,7 +178,8 @@ bool Player::isValidJunction(Vertex *v, Board &b)
             __throw_invalid_argument("Building failed according 'Distance Rule'");
     }
 
-    if (settlements.size() + cities.size() < 2) // If this is build of the begin of game
+    // If this is build of the begin of game
+    if (settlements.size() + cities.size() < 2)
         return true;
 
     // Finally, check if there are exist roads that leads to v
@@ -284,12 +286,12 @@ void Player::rollDice(Catan &catan, vector<Player *> &p)
     cout << "The result is: " << result << endl
          << endl;
 
-    // if (result == 7)
-    // {
-    //     cout << "All players need to divide them resources" << endl;
-    //     catan.giveBackResources(p);
-    // }
-    // else
+    if (result == 7)
+    {
+        cout << "All players need to divide them resources" << endl;
+        catan.giveBackResources(p);
+    }
+    else
         catan.shareResources(p, result);
 }
 
@@ -335,14 +337,30 @@ void Player::buildCity(int junction, Board &b)
     if (v->getColor() != this->color)
         __throw_invalid_argument("Build failed! You cann't build city here because you haven't settlement on this junction");
 
-    points += 2;         // take more 2 points
+    points += 1;         // take more 1 points
     cities.push_back(v); // add the vertex to player's vector of cities
-
     // remove the vertex from player's vector of settlements
-    for (auto it = this->settlements.begin(); it != this->settlements.end(); ++it)
+    size_t i = 0;
+    // Vertex* u = this->settlements[0];
+    // while (u->getVertex() != v->getVertex())
+    // {
+    //     i++;
+    //     u = this->settlements[i];
+    // }
+    // this->settlements.;
+
+    if (this->settlements.size() == 1)
     {
-        if ((*it) == v)
-            it = this->settlements.erase(it);
+        auto it = this->settlements.begin();
+        this->settlements.erase(it);
+    }
+    else
+    {
+        for (auto it = this->settlements.begin(); it != this->settlements.end(); ++it)
+        {
+            if ((*it) == v)
+                it = this->settlements.erase(it);
+        }
     }
     resources[iron] -= 3;
     resources[wheat] -= 2;
@@ -367,16 +385,17 @@ void Player::trade(Player *p, string yourResource, int countReceive, string myRe
     }
 
     cout << p->getName() << ", do you want to trade " << countReceive << " " << yourResource << " instead of " << countGive << " " << myResource << " with " << this->getName() << "? [Y/n] ";
-    char answer = getchar(); //get answer (Yes/No) from the player
+    char answer = getchar(); // get answer (Yes/No) from the player
 
     if (answer == 'Y')
     {
         this->resources[wantedResource] += countReceive;
         this->resources[unwantedResource] -= countGive;
-        p->setResources(wantedResource, p->getResources()[wantedResource]-countReceive);
-        p->setResources(unwantedResource, p->getResources()[unwantedResource]+countGive);
+        p->setResources(wantedResource, p->getResources()[wantedResource] - countReceive);
+        p->setResources(unwantedResource, p->getResources()[unwantedResource] + countGive);
 
-        cout << endl << this->getName() << " and " << p->getName() << " have a deal!" << endl;
+        cout << endl
+             << this->getName() << " and " << p->getName() << " have a deal!" << endl;
         cout << "The new resources are:" << endl;
         this->printResources();
         p->printResources();
@@ -385,6 +404,61 @@ void Player::trade(Player *p, string yourResource, int countReceive, string myRe
     else
         cout << p->getName() << " didn't agree to the deal" << endl;
 
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //clean the buffer for the next trade
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // clean the buffer for the next trade
+}
 
+int Player::getKnights() { return this->knights; }
+void Player::addKnights() { this->knights++; }
+bool Player::hasLargestArmy() { return largestArmy;}
+void Player::lossLargestArmy() { this->largestArmy = false; }
+
+/**
+ * Every time that player get development card from type "knights" he called to this function.
+ * The function check if the player has 3 or more knights more over each other player.
+ * If he has, the function uodate the boolean varriable "largestArmy" for all players
+ * and the generall boolean variable "largestArmy"
+ */
+void Player::reachLargestArmy(Catan &catan, vector<Player *> &p)
+{
+    if (this->knights >= 3 && this->knights > catan.mostKnights)
+    {
+        cout << this->getName() << " acheive the largest army" << endl;
+        catan.mostKnights = this->knights;
+        for (size_t i = 0; i < p.size(); i++)
+        {
+            if (p[i]->getName() == this->getName())
+                this->largestArmy = true;
+            else
+                p[i]->lossLargestArmy();
+        }
+    }
+}
+
+/**
+ * The function random number between 1 to 5
+ * The number represents the index of the decelopment cards which in catan's vector of cards 
+ * If the number is index of developmend card "knights" - check if the player get the "largest army"
+ * If the player has not resources enough - return
+ */
+void Player::buyDevelopmentCard(Catan &catan, vector<Player *> &p, Board &b)
+{
+    if (resources[iron] < 1 || resources[wheat] < 1 || resources[wool] < 1)
+    {
+        cout << "You have not enough resources to buy a development card" << endl;
+        return;
+    }
+
+    int randomCard = (rand() % 5); // random number(1,5) that represents index in catan's vector of develpment cards
+    catan.getCards()[(size_t)randomCard]->playCard(p, catan.currentTurn, b);
+
+    if (randomCard == 1) // if the card is a knight
+        this->reachLargestArmy(catan, p);
+}
+
+
+void Player::cleanPlayer()
+{
+    roads.clear();
+    settlements.clear();
+    cities.clear();
 }

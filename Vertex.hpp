@@ -20,6 +20,8 @@ private:
 
 public:
     Vertex(int index);
+    ~Vertex();
+    
     int getVertex();
     int getColor();
     void setColor(int color);

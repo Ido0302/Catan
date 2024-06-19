@@ -12,6 +12,11 @@
 #include "Catan.hpp"
 #include "Player.hpp"
 
+#include "DevelopmentCard.hpp"
+#include "Knight.hpp"
+#include "VictoryPoint.hpp"
+#include "ProgressCard.hpp"
+
 using namespace std;
 
 // constructor
@@ -22,11 +27,35 @@ Catan::Catan(Player *p1, Player *p2, Player *p3)
     this->players.push_back(p3);
 
     this->currentTurn = 0;
+    this->mostKnights = 0;
+
+    VictoryPoint *vp = new VictoryPoint();
+    Knight *knight = new Knight();
+    ProgressCard *pro1 = new ProgressCard("building");
+    ProgressCard *pro2 = new ProgressCard("plenty");
+    ProgressCard *pro3 = new ProgressCard("monopoly");
+
+    this->cards.push_back(vp);
+    this->cards.push_back(knight);
+    this->cards.push_back(pro1);
+    this->cards.push_back(pro2);
+    this->cards.push_back(pro3);
 }
 
 vector<Player *> Catan::getPlayers()
 {
     return this->players;
+}
+
+vector<DevelopmentCard *> Catan::getCards()
+{
+    return this->cards;
+}
+
+Board Catan::getBoard()
+{
+    Board board;
+    return board;
 }
 
 /**
@@ -80,14 +109,11 @@ void Catan::printPlayers()
     }
 }
 
-Board Catan::getBoard()
+void Catan::endTurn(vector<Player *> p)
 {
-    Board b;
-    return b;
-}
+    // check if the acheive 10 points or more
+    this->gameWinner(p[currentTurn]);
 
-void Catan::endTurn()
-{
     currentTurn = (currentTurn + 1) % 3;
 }
 
@@ -95,7 +121,7 @@ void Catan::endTurn()
  * The function get vector of players and rollNumber
  * The function finds who has settlemens or cities on junctions that limits with every tile with the rollNumber and add to player resources
  */
-void Catan::shareResources(vector<Player *>& players, int rollNumber)
+void Catan::shareResources(vector<Player *> &players, int rollNumber)
 {
     vector<Tile> sameRollTiles = getBoard().findTiles(rollNumber);
 
@@ -115,7 +141,7 @@ void Catan::shareResources(vector<Player *>& players, int rollNumber)
             {
                 if (t.foundVertex(v) == true)
                 {
-                    p->addResource(t.getLand()); // add double resorce if one of the cities is on tile
+                    p->addResource(t.getLand()); // add double resource if one of the cities is on tile
                     p->addResource(t.getLand());
                 }
             }
@@ -126,7 +152,7 @@ void Catan::shareResources(vector<Player *>& players, int rollNumber)
 /**
  * The function halve the count of each resource for all the players
  */
-void Catan::giveBackResources(vector<Player*> &players)
+void Catan::giveBackResources(vector<Player *> &players)
 {
     cout << "The new resources are:" << endl;
     size_t n = players[0]->getResources().size();
@@ -134,7 +160,7 @@ void Catan::giveBackResources(vector<Player*> &players)
 
     for (size_t i = 0; i < players.size(); i++)
     {
-        Player* p = players[i];
+        Player *p = players[i];
         int count = 0;
 
         // count all resources
@@ -148,7 +174,7 @@ void Catan::giveBackResources(vector<Player*> &players)
         {
             count % 2 ? (++count) /= 2 : count /= 2; // halve count. if odd - round up
 
-            //make new resources's vector according the new count
+            // make new resources's vector according the new count
             int r = 0;
             while (count > 0)
             {
@@ -157,7 +183,7 @@ void Catan::giveBackResources(vector<Player*> &players)
                 r < 4 ? ++r : r = 0;
             }
 
-            //change the count of each resource to new count
+            // change the count of each resource to new count
             for (size_t j = 0; j < n; j++)
             {
                 p->setResources(j, newResources[j]);
@@ -166,4 +192,18 @@ void Catan::giveBackResources(vector<Player*> &players)
         }
         p->printResources();
     }
+}
+
+// Every time that player end his turn, catan check if he get 10 points before the member "currentTurn" pass over
+void Catan::gameWinner(Player *p)
+{
+    if (p->getPoints() >= 10)
+        cout << "The winner is: " << p->getName() << "!" << endl;
+}
+
+void Catan::clearCatan()
+{
+    for (size_t i = 0; i < cards.size(); i++)
+        delete (cards[i]);
+    cards.clear();
 }

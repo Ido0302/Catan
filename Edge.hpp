@@ -19,6 +19,8 @@ private:
 
 public:
     Edge(Vertex* v1, Vertex* v2);
+    ~Edge();
+    
     int getV1();
     int getV2();
     Vertex* getV1Address();

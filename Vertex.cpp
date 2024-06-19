@@ -13,6 +13,8 @@ Vertex::Vertex(int index) : index(index)
         __throw_invalid_argument("Invalid vertex: There are 54 vertices in board.");
 }
 
+Vertex::~Vertex(){}
+
 int Vertex::getVertex()
 {
     return this->index;
