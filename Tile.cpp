@@ -9,71 +9,111 @@
 using namespace std;
 
 // constructor
-Tile::Tile(vector<Vertex> &vertices, int roll, Resource r)
+Tile::Tile(vector<Vertex *> &vertices, vector<Edge *> &edges, int circleNumber, Land l)
 {
+    // if the vector of vertices contains more than or less than 6 vertices
     if (vertices.size() != 6)
         __throw_invalid_argument("Invalid tile: The tile should to be with six vertices.");
     this->junctions = vertices;
 
-    for (size_t i = 0; i < 5; i++)
-    {
-        this->lanes.emplace_back(vertices[i], vertices[i + 1]);
-    }
-    this->lanes.emplace_back(vertices.back(), vertices.front());
+    // if the vector of edges contains more than or less than 6 vertices
+    if (edges.size() != 6)
+        __throw_invalid_argument("Invalid tile: The tile should to be with six edges.");
+    this->lanes = edges;
 
-    if (roll < 2 || roll > 12)
+    // if the circle number isn't ideal roll
+    if (circleNumber < 2 || circleNumber > 12)
         __throw_invalid_argument("Invalid roll: the roll should be between 2 to 12");
-    this->rollDices = roll;
+    this->circleNumber = circleNumber;
 
-    this->resource = r;
+    this->land = l;
 }
 
-//constructor desert tile
-Tile::Tile(vector<Vertex> &vertices)
+// constructor desert tile who doesn't include circle number or Land
+Tile::Tile(vector<Vertex *> &vertices, vector<Edge *> &edges)
 {
     if (vertices.size() != 6)
         __throw_invalid_argument("Invalid tile: The tile should to be with six vertices.");
     this->junctions = vertices;
 
-    for (size_t i = 0; i < 5; i++)
-    {
-        this->lanes.emplace_back(vertices[i], vertices[i + 1]);
-    }
-    this->lanes.emplace_back(vertices.back(), vertices.front());
+    if (edges.size() != 6)
+        __throw_invalid_argument("Invalid tile: The tile should to be with six edges.");
+    this->lanes = edges;
 
-    this->resource = Resource::Desert;
-    this->rollDices = 0;
+    this->land = Land::Desert;
+    this->circleNumber = 0;
 }
 
-vector<Vertex> &Tile::getJunctions()
+Tile::~Tile(){}
+
+vector<Vertex *> &Tile::getJunctions()
 {
     return this->junctions;
 }
 
-vector<Edge> &Tile::getLanes()
+vector<Edge *> &Tile::getLanes()
 {
     return this->lanes;
 }
 
-int Tile::getRollDices()
+int Tile::getCircleNumber()
 {
-    return this->rollDices;
+    return this->circleNumber;
 }
 
-string Tile::getResource()
+Land Tile::getLand()
 {
-    switch (this->resource)
+    switch (this->land)
     {
-    case Resource::Hill:
+    case Land::Hill:
+        return Land::Hill;
+    case Land::Forest:
+        return Land::Forest;
+    case Land::Mountain:
+        return Land::Mountain;
+    case Land::Field:
+        return Land::Field;
+    case Land::Pasture:
+        return Land::Pasture;
+    }
+    return Land::Desert;
+}
+
+// get function that return the string of the Land
+string Tile::getLandAsString()
+{
+    switch (this->land)
+    {
+    case Land::Hill:
         return "Hill";
-    case Resource::Forest:
+    case Land::Forest:
         return "Forest";
-    case Resource::Mountain:
+    case Land::Mountain:
         return "Mountain";
-    case Resource::Field:
+    case Land::Field:
         return "Field";
-    case Resource::Pasture:
+    case Land::Pasture:
         return "Pasture";
     }
     return "Desert";
+}
+
+void Tile::printTile()
+{
+    cout << "The land: " << this->getLandAsString() << ". The circle number: " << this->circleNumber << endl;
+}
+
+/**
+ * get vertex and return true if it's belong to tile. else rerurn false
+ */
+bool Tile::foundVertex(Vertex *v)
+{
+    for (size_t i = 0; i < TILE_LENGTH; i++)
+    {
+        if (junctions[i]->getVertex() == v->getVertex())
+        {
+            return true;
+        }
+    }
+    return false;
 }

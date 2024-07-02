@@ -7,17 +7,16 @@
 
 using namespace std;
 
-class Person{
-    private:
+class Person
+{
+private:
     string name;
     int age;
 
-    public:
+public:
     Person(string name, int age);
     string getName();
     int getAge();
 };
-
-
 
 #endif

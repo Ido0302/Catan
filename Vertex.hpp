@@ -7,15 +7,24 @@
 
 using namespace std;
 
+#define red 1
+#define orange 2
+#define white 3
+
 class Vertex
 {
 private:
-    int index; //0-53
-    bool empty = true;
+    int index; // 0-53
+    int color = 0;
+    bool clear = true;
 
 public:
     Vertex(int index);
+    ~Vertex();
+    
     int getVertex();
+    int getColor();
+    void setColor(int color);
     bool isEmpty();
     void build();
 };
